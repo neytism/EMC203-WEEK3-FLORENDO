@@ -19,7 +19,6 @@ public class EnemySpawner : MonoBehaviour
         {
             _instance = this;
             DontDestroyOnLoad(gameObject);
-            InitializeWaypoints();
         }
         else
         {
@@ -52,6 +51,8 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
+        waypointHolder = GameObject.FindWithTag("WaypointsHolder").transform;
+        InitializeWaypoints();
         StartWave();
         SpawnEnemy();
         UpdateUI();

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5739423607227265252}
   - component: {fileID: 8036348272040684129}
   - component: {fileID: 6931614351570754930}
-  - component: {fileID: -1169652909533252856}
+  - component: {fileID: 4447584639652764390}
   m_Layer: 0
   m_Name: Laser
   m_TagString: Laser
@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8036348272040684129
 SpriteRenderer:
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 648f2dad5f0a6324f8b6edebc02619d4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -199,7 +199,7 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
---- !u!114 &-1169652909533252856
+--- !u!114 &4447584639652764390
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -208,7 +208,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8689636347006284158}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 043d227421d90034db458c71037bba53, type: 3}
+  m_Script: {fileID: 11500000, guid: fdaeccfd1d9739a498d1f01737e87555, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 250
+  _bulletLife: 3
+  enableDebug: 1
+  _bulletRange: 0.5
+  _bulletSpeed: 15
+  _trailRenderer: {fileID: 6931614351570754930}
+  _particle: {fileID: 2218350500062538740, guid: 62b54166704b5164ebcad2673e5fddc7, type: 3}

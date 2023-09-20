@@ -16,6 +16,9 @@ public class TurretTest : MonoBehaviour
     [SerializeField] private float _maxRange = 8f;
     [SerializeField] private float _maxFireRate = 4f;
     
+    [Range(0f, 360f)]
+    [SerializeField] private float _viewAngleRange = 10f;
+    
     [SerializeField] private int _rangeUpgradeCost = 10;
     [SerializeField] private int _fireRateUpgradeCost = 15;
     
@@ -31,6 +34,8 @@ public class TurretTest : MonoBehaviour
     
     [SerializeField] private TextMeshProUGUI _fireRateText;
     [SerializeField] private TextMeshProUGUI _rangeText;
+    
+    [SerializeField] private GameObject _bulletPrefab;
 
     private void Start()
     {
@@ -70,7 +75,7 @@ public class TurretTest : MonoBehaviour
 
     private void RotateTowardsTarget()
     {
-        DisplayLaser();
+        //DisplayLaser();
 
         if (_target == null) return;
         
@@ -88,17 +93,13 @@ public class TurretTest : MonoBehaviour
     
     private void Fire()
     {
+        if(IsTargetLocked()) return;
         
         if(shotsInterval <= 0)
         {
-            RaycastHit2D hit = Physics2D.Raycast(firePoint.position, firePoint.up, _range);
-
-            if (hit.transform != null && hit.transform.CompareTag("Enemy"))
-            {
-                //incorporate dot product here
-                hit.transform.gameObject.GetComponent<EnemyTest>().HealthTrigger();
-
-            }
+            GameObject bullet = ObjectPool.Instance.PoolObject(_bulletPrefab, firePoint.position);
+            bullet.GetComponent<BulletTest>().InitializeBullet(firePoint.up);
+            bullet.SetActive(true);
             
             shotsInterval = 1f / _fireRate;  // adds interval between shots,, calculated from fire rate
             
@@ -107,6 +108,14 @@ public class TurretTest : MonoBehaviour
             shotsInterval -= Time.deltaTime;
         }
         
+    }
+
+    private bool IsTargetLocked()
+    {
+        Vector3 directionToPlayer = _target.transform.position - transform.position;
+        float dotProduct = DotProduct(NormalizeVector(directionToPlayer), transform.up);
+
+        return dotProduct < ConvertViewAngle(_viewAngleRange);
     }
     
     private float Distance(Vector3 firstPos, Vector3 secondPos)
@@ -166,17 +175,9 @@ public class TurretTest : MonoBehaviour
 
     }
 
-    private void DisplayLaser()
+    private float ConvertViewAngle(float angle)
     {
-        if (_target != null)
-        {
-            _lineRenderer.enabled = true;
-            _lineRenderer.SetPositions(new []{firePoint.position, firePoint.position + firePoint.up * Distance(firePoint.position, _target.transform.position)});
-        }
-        else
-        {
-            _lineRenderer.enabled = false;
-        }
+        return Mathf.Cos(angle * 0.5f * Mathf.Deg2Rad);
     }
 
     private void UpdateUI()

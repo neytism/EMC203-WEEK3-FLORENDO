@@ -78,6 +78,14 @@ public class EnemyTest : MonoBehaviour
                 {
                     float segmentInterpolation = (distanceTraveled - currentTotalSegmentLength) / currentSegmentLength;
                     transform.position = Vector2.Lerp(_waypoints[i].position, _waypoints[i + 1].position, segmentInterpolation);
+                    
+                    // Vector2 basePosition = transform.position = Vector2.Lerp(_waypoints[i].position, _waypoints[i + 1].position, segmentInterpolation);
+                    //
+                    // // Add a sine wave to the movement
+                    // _sineAngle += Time.deltaTime * _sineSpeed;
+                    // Vector2 randomMovement = new Vector2(Mathf.Sin(_sineAngle) * _sineLength, Mathf.Cos(_sineAngle) * _sineLength);
+                    // transform.position = basePosition + randomMovement;
+                    
                     break;
                 }
                 
@@ -86,6 +94,7 @@ public class EnemyTest : MonoBehaviour
         }
         else
         {
+            //if enemy reaches the last waypoint
             DecreasePlayerHealth?.Invoke();
             gameObject.SetActive(false);
         }

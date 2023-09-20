@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 238dba7886997294581680f0992dea4e
+guid: 3ccb334c79e5d004ca003d2b8ad68fe4
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Typo Draft Demo
+  - Kindergarden
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

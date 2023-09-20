@@ -47,12 +47,14 @@ public class EnemySpawner : MonoBehaviour
     private bool _canSpawnEnemy = false;
     
     private GameObject[] enemies;
+    private LineRenderer _lineRenderer;
    
 
     private void Start()
     {
         waypointHolder = GameObject.FindWithTag("WaypointsHolder").transform;
         InitializeWaypoints();
+        InitializeLineRenderer();
         StartWave();
         SpawnEnemy();
         UpdateUI();
@@ -66,6 +68,20 @@ public class EnemySpawner : MonoBehaviour
         foreach (Transform child in waypointHolder)
         {
             waypoints.Add(child);
+        }
+    }
+
+    private void InitializeLineRenderer()
+    {
+        _lineRenderer = GetComponent<LineRenderer>();
+        
+        if (waypointHolder == null) return;
+
+        _lineRenderer.positionCount = waypoints.Count;
+        
+        for (int i = 0; i < waypoints.Count; i++)
+        {
+            _lineRenderer.SetPosition(i, waypoints[i].position);
         }
     }
 

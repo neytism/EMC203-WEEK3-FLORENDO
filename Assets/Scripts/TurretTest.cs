@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
+using Random = UnityEngine.Random;
 
 public class TurretTest : MonoBehaviour
 {
@@ -27,8 +28,9 @@ public class TurretTest : MonoBehaviour
     
     [SerializeField] private float shotsInterval;
     [SerializeField] private Transform firePoint;
-    
-    [SerializeField] private LineRenderer _lineRenderer;
+
+    [SerializeField] private float randomTargetChangeInterval;
+    [SerializeField] private Vector2 randomAngle;
     
     private GameObject[] enemies;
     
@@ -45,7 +47,15 @@ public class TurretTest : MonoBehaviour
     private void Update()
     {
         UpdateTarget();
-        RotateTowardsTarget();
+        
+        if (_target == null)
+        {
+            RotateTowardsRandom();
+        }
+        else
+        {
+            RotateTowardsTarget();
+        }
         
     }
 
@@ -75,20 +85,39 @@ public class TurretTest : MonoBehaviour
 
     private void RotateTowardsTarget()
     {
-        //DisplayLaser();
 
-        if (_target == null) return;
-        
         if (Distance(transform.position, _target.transform.position) > _range) return;
         
         Fire();
         
-        //from old code, need to change according to instructions
+        Vector2 directionToPlayer = _target.transform.position - transform.position;
         
-        Vector2 direction = _target.transform.position - transform.position;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-        Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, _turnSpeed * Time.deltaTime);
+        //rotate using Vector3.Slerp
+        //transform.up = Vector3.Slerp(transform.up, NormalizeVector(directionToPlayer), _turnSpeed * Time.deltaTime);
+        
+        //rotate using Quaternion.Slerp
+        float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg - 90;
+        Quaternion zRotation = Quaternion.Euler(0f, 0f, angle);
+        transform.rotation = Quaternion.Slerp(transform.rotation, zRotation, _turnSpeed * Time.deltaTime);
+    }
+
+    private void RotateTowardsRandom()
+    {
+        
+        if(randomTargetChangeInterval <= 0)
+        {
+            //rotate using Quaternion.Slerp
+            randomAngle = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+            randomTargetChangeInterval = Random.Range(2f, 10f);  // random interval seconds
+            
+        } else
+        {
+            randomTargetChangeInterval -= Time.deltaTime;
+        }
+        
+        float angle = Mathf.Atan2(randomAngle.y, randomAngle.x) * Mathf.Rad2Deg - 90;
+        Quaternion zRotation = Quaternion.Euler(0f, 0f, angle);
+        transform.rotation = Quaternion.Slerp(transform.rotation, zRotation, (_turnSpeed / 5) * Time.deltaTime);
     }
     
     private void Fire()
@@ -112,7 +141,7 @@ public class TurretTest : MonoBehaviour
 
     private bool IsTargetLocked()
     {
-        Vector3 directionToPlayer = _target.transform.position - transform.position;
+        Vector2 directionToPlayer = _target.transform.position - transform.position;
         float dotProduct = DotProduct(NormalizeVector(directionToPlayer), transform.up);
 
         return dotProduct < ConvertViewAngle(_viewAngleRange);

@@ -51,7 +51,10 @@ public class EnemySpawner : MonoBehaviour
     private bool _canSpawnEnemy = false;
     
     private GameObject[] enemies;
-    private LineRenderer _lineRenderer;
+    [SerializeField] private LineRenderer _lineRendererStraight;
+    [SerializeField] private LineRenderer _lineRendererQuadratic;
+    [SerializeField] private LineRenderer _lineRendererCubic;
+    
    
 
     private void Start()
@@ -72,24 +75,12 @@ public class EnemySpawner : MonoBehaviour
         
         ObjectPool.Instance.DisposeAll();
         
-        InitializeLineRenderer();
+        InitializeLineRendererStraight();
+        InitializeLineRendererQuadratic();
+        InitializeLineRendererCubic();
         StartWave();
         SpawnEnemy();
         UpdateUI();
-    }
-
-    private void InitializeLineRenderer()
-    {
-        _lineRenderer = GetComponent<LineRenderer>();
-        
-        if (waypointHolder == null) return;
-
-        _lineRenderer.positionCount = waypoints.Count;
-        
-        for (int i = 0; i < waypoints.Count; i++)
-        {
-            _lineRenderer.SetPosition(i, waypoints[i].position);
-        }
     }
 
     public float GetTotalLength()
@@ -171,6 +162,51 @@ public class EnemySpawner : MonoBehaviour
             }
         }
         
+    }
+    
+    private void InitializeLineRendererStraight()
+    {
+        if (waypointHolder == null) return;
+
+        _lineRendererStraight.positionCount = waypoints.Count;
+        
+        for (int i = 0; i < waypoints.Count; i++)
+        {
+            _lineRendererStraight.SetPosition(i, waypoints[i].position);
+        }
+    }
+
+    private void InitializeLineRendererQuadratic()
+    {
+        if (waypointHolder == null) return;
+
+        float t = 0;
+
+        Vector3 bezier = new Vector3(0,0,0);
+
+        _lineRendererQuadratic.positionCount = 100;
+        
+        for (int i = 0; i < _lineRendererQuadratic.positionCount; i++)
+        {
+            bezier = (1 - t) * (1 - t) * waypoints[0].position + 2 * (1 - t) * t * waypoints[1].position + t * t * waypoints[2].position;
+            //bezier = EvaluateQuadraticCurve(waypoints[1].position, waypoints[2].position, waypoints[3].position, t);
+            _lineRendererQuadratic.SetPosition(i, bezier);
+            t += (1 / (float)_lineRendererQuadratic.positionCount);
+        }
+    }
+
+    private void InitializeLineRendererCubic()
+    {
+        if (waypointHolder == null) return;
+    }
+
+    public Vector3 EvaluateQuadraticCurve(Vector3 start, Vector3 mid, Vector3 end, float t)
+    {
+        Vector3 p0 = Mathf.Pow(t, 2) * start;
+        Vector3 p1 = (1 - t) * 2 * t * mid;
+        Vector3 p2 = Mathf.Pow(t, 2) * end;
+
+        return p0 + p1 + p2;
     }
 
     public void StartWave()

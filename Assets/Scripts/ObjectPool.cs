@@ -14,15 +14,17 @@ public class ObjectPool : MonoBehaviour
 
     private void Awake()
     {
-        if (_instance == null)
-        {
+        if (_instance == null) {
+            
             _instance = this;
-            DontDestroyOnLoad(gameObject);
+            
+        } else if (_instance != this) {
+            
+            Destroy (gameObject);
+            
         }
-        else
-        {
-            Destroy(this);
-        }
+ 
+        DontDestroyOnLoad (gameObject);
     }
 
     #endregion
@@ -194,5 +196,15 @@ public class ObjectPool : MonoBehaviour
         {
             Destroy(t);
         }
+    }
+
+    public void DisposeAll()
+    {
+        foreach (var t in _objectsPool)
+        {
+            Destroy(t);
+        }
+        
+        _objectsPool.Clear();
     }
 }

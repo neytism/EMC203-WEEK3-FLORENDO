@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,24 +15,25 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (_instance == null)
-        {
+        if (_instance == null) {
+            
             _instance = this;
-            DontDestroyOnLoad(gameObject);
+            
+        } else if (_instance != this) {
+            
+            Destroy (gameObject);
+            
         }
-        else
-        {
-            Destroy(this);
-        }
+ 
+        DontDestroyOnLoad (gameObject);
     }
 
     #endregion
-    
+
+    public event Action<int, int> UpdateUITrigger;
     
     [SerializeField] private int _health = 10;
     [SerializeField] private int _coins = 0;
-    [SerializeField] private TextMeshProUGUI _healthText;
-    [SerializeField] private TextMeshProUGUI _coinText;
 
     public int GetCoinCount => _coins;
 
@@ -58,8 +58,7 @@ public class GameManager : MonoBehaviour
 
     private void UpdateUI()
     {
-        _healthText.text = $"Health: {_health}";
-        _coinText.text = $"Coins: {_coins}";
+       UpdateUITrigger?.Invoke(_health, _coins);
     }
 
     private void DecreaseHealth()
@@ -91,11 +90,31 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
+    public void ChangeTimeScale()
+    {
+        if (Time.timeScale == 1f)
+        {
+            Time.timeScale = 2f;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+    }
+
+    private void Restart()
+    {
+        ObjectPool.Instance.DisposeAll();
+        EnemySpawner.Instance.ResetSpawner();
+        Time.timeScale = 1f;
+    }
 
     IEnumerator GameOverCoroutine()
     {
         Time.timeScale = 0f;
         yield return new WaitForSecondsRealtime(3f);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Restart();
+
     }
+    
 }

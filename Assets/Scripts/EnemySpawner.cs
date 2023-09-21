@@ -15,25 +15,29 @@ public class EnemySpawner : MonoBehaviour
 
     private void Awake()
     {
-        if (_instance == null)
-        {
+        if (_instance == null) {
+            
             _instance = this;
-            DontDestroyOnLoad(gameObject);
+            
+        } else if (_instance != this) {
+            
+            Destroy (gameObject);
+            
         }
-        else
-        {
-            Destroy(this);
-        }
+ 
+        DontDestroyOnLoad (gameObject);
     }
 
     #endregion
+
+    public event Action<int> UpdateUIWaveCount;
+    public event Action<bool> UpdateUIWaveButton;
     
     [SerializeField] private float _enemySpawnRate = 2f;
     [SerializeField] private GameObject _enemyPrefab;
-    [SerializeField] private Transform waypointHolder;
     [SerializeField] private int _maxNumberOfEnemiesSpawned = 10;
-    [SerializeField] private TextMeshProUGUI _waveNumberText;
-    [SerializeField] private GameObject _startWaveButton;
+    
+    private Transform waypointHolder;
     
     public float enemyMoveDuration = 10f;
     private float _timer;
@@ -52,23 +56,26 @@ public class EnemySpawner : MonoBehaviour
 
     private void Start()
     {
-        waypointHolder = GameObject.FindWithTag("WaypointsHolder").transform;
-        InitializeWaypoints();
-        InitializeLineRenderer();
-        StartWave();
-        SpawnEnemy();
-        UpdateUI();
+        InitializeSpawner();
     }
 
-    private void InitializeWaypoints()
+    private void InitializeSpawner()
     {
-        //initialize waypoints on awake
+        waypointHolder = GameObject.FindWithTag("WaypointsHolder").transform;
+        
         waypoints = new List<Transform>();
         
         foreach (Transform child in waypointHolder)
         {
             waypoints.Add(child);
         }
+        
+        ObjectPool.Instance.DisposeAll();
+        
+        InitializeLineRenderer();
+        StartWave();
+        SpawnEnemy();
+        UpdateUI();
     }
 
     private void InitializeLineRenderer()
@@ -126,14 +133,12 @@ public class EnemySpawner : MonoBehaviour
         if (_numberOfEnemiesSpawned >= _maxNumberOfEnemiesSpawned)
         {
             _canSpawnEnemy = false;
-            //will have a max number of enemies to be spawned per wave
-            //if it meets max, stop spawning
         }
     }
 
     private void UpdateUI()
     {
-        _waveNumberText.text = $"Wave {_waveNumber}";
+       UpdateUIWaveCount?.Invoke(_waveNumber);
     }
 
     private void WaveModifier()
@@ -162,7 +167,7 @@ public class EnemySpawner : MonoBehaviour
 
             if (allEnemiesDead)
             {
-                _startWaveButton.SetActive(true); //if the code above didnt break, all enemies are dead.
+                UpdateUIWaveButton?.Invoke(true);  //if the code above didnt break, all enemies are dead.
             }
         }
         
@@ -180,7 +185,19 @@ public class EnemySpawner : MonoBehaviour
         
         UpdateUI(); // upd.. yes
         
-        _startWaveButton.SetActive(false); // hides button
+        UpdateUIWaveButton?.Invoke(false);  // hides button
+
+    }
+
+    public void ResetSpawner()
+    {
+        _enemySpawnRate = 0.5f;
+        _maxNumberOfEnemiesSpawned = 15;
+        enemyMoveDuration = 40;
+        _waveNumber = 0;
+        
+        UpdateUIWaveButton?.Invoke(true);
+        UpdateUI();
 
     }
     

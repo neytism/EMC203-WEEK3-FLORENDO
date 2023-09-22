@@ -14,17 +14,15 @@ public class ObjectPool : MonoBehaviour
 
     private void Awake()
     {
-        if (_instance == null) {
-            
+        if (_instance == null)
+        {
             _instance = this;
-            
-        } else if (_instance != this) {
-            
-            Destroy (gameObject);
-            
+            DontDestroyOnLoad(gameObject);
         }
- 
-        DontDestroyOnLoad (gameObject);
+        else
+        {
+            Destroy(this);
+        }
     }
 
     #endregion
@@ -35,6 +33,7 @@ public class ObjectPool : MonoBehaviour
     public List<GameObject> _objectsPool;
     public List<GameObject> _objectsPoolUI;
     public Transform spawnedObjectsHolder;
+    public Dictionary<string, Transform> subParents;
 
     private void OnEnable()
     {
@@ -169,7 +168,7 @@ public class ObjectPool : MonoBehaviour
     
     public void CreateSubParents()
     {
-        Dictionary<string, Transform> subParents = new Dictionary<string, Transform>();
+       subParents = new Dictionary<string, Transform>();
 
         foreach (GameObject obj in _objectsPool)
         {
@@ -192,6 +191,7 @@ public class ObjectPool : MonoBehaviour
 
     public void Dispose(List<GameObject> pool)
     {
+        if (pool == null) return;
         foreach (var t in pool)
         {
             Destroy(t);
@@ -204,7 +204,7 @@ public class ObjectPool : MonoBehaviour
         {
             Destroy(t);
         }
-        
+
         _objectsPool.Clear();
     }
 }

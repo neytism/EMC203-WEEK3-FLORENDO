@@ -221,13 +221,15 @@ MonoBehaviour:
   _fireRate: 1
   _maxRange: 8
   _maxFireRate: 4
+  _viewAngleRange: 20
   _rangeUpgradeCost: 10
   _fireRateUpgradeCost: 15
   _turnSpeed: 20
   _target: {fileID: 0}
   shotsInterval: 0
   firePoint: {fileID: 643476979051325098}
-  _lineRenderer: {fileID: 8951608925219613532}
+  randomTargetChangeInterval: 0
+  randomAngle: {x: 0, y: 0}
   _fireRateText: {fileID: 0}
   _rangeText: {fileID: 0}
   _bulletPrefab: {fileID: 8689636347006284158, guid: 02f2ed6fbef880c4f8e930edb8410961, type: 3}

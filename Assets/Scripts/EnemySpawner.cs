@@ -15,17 +15,15 @@ public class EnemySpawner : MonoBehaviour
 
     private void Awake()
     {
-        if (_instance == null) {
-            
+        if (_instance == null)
+        {
             _instance = this;
-            
-        } else if (_instance != this) {
-            
-            Destroy (gameObject);
-            
+            DontDestroyOnLoad(gameObject);
         }
- 
-        DontDestroyOnLoad (gameObject);
+        else
+        {
+            Destroy(this);
+        }
     }
 
     #endregion
@@ -36,7 +34,7 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private float _enemySpawnRate = 2f;
     [SerializeField] private GameObject _enemyPrefab;
     [SerializeField] private int _maxNumberOfEnemiesSpawned = 10;
-    
+
     private Transform waypointHolder;
     
     public float enemyMoveDuration = 10f;
@@ -50,17 +48,33 @@ public class EnemySpawner : MonoBehaviour
     private int _waveNumber = 0;
     private bool _canSpawnEnemy = false;
     
-    private GameObject[] enemies;
-    [SerializeField] private LineRenderer _lineRendererStraight;
-    [SerializeField] private LineRenderer _lineRendererQuadratic;
-    [SerializeField] private LineRenderer _lineRendererCubic;
-    
-   
+    private List<GameObject> enemies;
+    private void OnEnable()
+    {
+        UIManager.StartNextWaveButtonTrigger += StartWave;
+    }
+
+    private void OnDisable()
+    {
+        UIManager.StartNextWaveButtonTrigger -= StartWave;
+    }
 
     private void Start()
     {
         InitializeSpawner();
     }
+    
+    private void Update()
+    {
+        CheckAliveEnemies();
+            
+        if (Time.time < _timer + 1f/_enemySpawnRate) return; //spawn rate
+        
+        SpawnEnemy();
+
+        _timer = Time.time;
+    }
+
 
     private void InitializeSpawner()
     {
@@ -73,11 +87,8 @@ public class EnemySpawner : MonoBehaviour
             waypoints.Add(child);
         }
         
-        ObjectPool.Instance.DisposeAll();
+        GetComponent<DrawLine>().Initialize(waypoints);
         
-        InitializeLineRendererStraight();
-        InitializeLineRendererQuadratic();
-        InitializeLineRendererCubic();
         StartWave();
         SpawnEnemy();
         UpdateUI();
@@ -98,20 +109,15 @@ public class EnemySpawner : MonoBehaviour
         return journeyLength;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        CheckAliveEnemies();
-            
-        if (Time.time < _timer + 1f/_enemySpawnRate) return; //spawn rate
-        
-        SpawnEnemy();
-
-        _timer = Time.time;
-    }
-
+    
     private void SpawnEnemy()
     {
+        if (waypointHolder == null)
+        {
+            InitializeSpawner();
+            return;
+        }
+        
         if (_enemyPrefab == null) return;
         
         if(!_canSpawnEnemy) return;
@@ -144,7 +150,7 @@ public class EnemySpawner : MonoBehaviour
     {
         if(_numberOfEnemiesSpawned >= _maxNumberOfEnemiesSpawned)
         {
-            enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            enemies = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy")) ;
             bool allEnemiesDead = true; //assuming all enemies r dead
 
             foreach (GameObject enemy in enemies)
@@ -163,57 +169,12 @@ public class EnemySpawner : MonoBehaviour
         }
         
     }
-    
-    private void InitializeLineRendererStraight()
-    {
-        if (waypointHolder == null) return;
-
-        _lineRendererStraight.positionCount = waypoints.Count;
-        
-        for (int i = 0; i < waypoints.Count; i++)
-        {
-            _lineRendererStraight.SetPosition(i, waypoints[i].position);
-        }
-    }
-
-    private void InitializeLineRendererQuadratic()
-    {
-        if (waypointHolder == null) return;
-
-        float t = 0;
-
-        Vector3 bezier = new Vector3(0,0,0);
-
-        _lineRendererQuadratic.positionCount = 100;
-        
-        for (int i = 0; i < _lineRendererQuadratic.positionCount; i++)
-        {
-            bezier = (1 - t) * (1 - t) * waypoints[0].position + 2 * (1 - t) * t * waypoints[1].position + t * t * waypoints[2].position;
-            //bezier = EvaluateQuadraticCurve(waypoints[1].position, waypoints[2].position, waypoints[3].position, t);
-            _lineRendererQuadratic.SetPosition(i, bezier);
-            t += (1 / (float)_lineRendererQuadratic.positionCount);
-        }
-    }
-
-    private void InitializeLineRendererCubic()
-    {
-        if (waypointHolder == null) return;
-    }
-
-    public Vector3 EvaluateQuadraticCurve(Vector3 start, Vector3 mid, Vector3 end, float t)
-    {
-        Vector3 p0 = Mathf.Pow(t, 2) * start;
-        Vector3 p1 = (1 - t) * 2 * t * mid;
-        Vector3 p2 = Mathf.Pow(t, 2) * end;
-
-        return p0 + p1 + p2;
-    }
 
     public void StartWave()
     {
         //this is referenced to a button
         
-        WaveModifier(); //will modify spawnrate, speed(based on duration), and number of enemies needed
+        WaveModifier(); //will modify spawn rate, speed(based on duration), and number of enemies needed
         
         _numberOfEnemiesSpawned = 0; //resets the enemy counter
         
@@ -231,7 +192,7 @@ public class EnemySpawner : MonoBehaviour
         _maxNumberOfEnemiesSpawned = 15;
         enemyMoveDuration = 40;
         _waveNumber = 0;
-        
+
         UpdateUIWaveButton?.Invoke(true);
         UpdateUI();
 

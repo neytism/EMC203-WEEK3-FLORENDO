@@ -63,33 +63,30 @@ public class EnemyTest : MonoBehaviour
         {
             //will calculate based on the time taken
             //this will make the enemy move at a constant speed
-            //the speed is determined by _pathTotalDistance / _duration
-            
-            float distanceTraveled = travelTime / _duration * _pathTotalDistance;  
+            //i kinda divided the variables for readability
 
-            float currentTotalSegmentLength = 0f;
+            float timePercentageFromDuration = travelTime / _duration;
+            
+            float distanceTraveled = timePercentageFromDuration * _pathTotalDistance;  
+
+            float pastSegmentsLength = 0f;
             
             for (int i = 0; i < _waypoints.Count - 1; i++)
             {
                 float currentSegmentLength = Vector3.Distance(_waypoints[i].position, _waypoints[i + 1].position);
+                float totalSegmentLengthTraveled = pastSegmentsLength + currentSegmentLength;
                 
-                
-                if (distanceTraveled < (currentTotalSegmentLength + currentSegmentLength))
+                if (distanceTraveled < totalSegmentLengthTraveled)
                 {
-                    float segmentInterpolation = (distanceTraveled - currentTotalSegmentLength) / currentSegmentLength;
-                    transform.position = Vector2.Lerp(_waypoints[i].position, _waypoints[i + 1].position, segmentInterpolation);
+                    float distanceInCurrentSegment = distanceTraveled - pastSegmentsLength;
+                    float segmentInterpolation = distanceInCurrentSegment / currentSegmentLength;
                     
-                    // Vector2 basePosition = transform.position = Vector2.Lerp(_waypoints[i].position, _waypoints[i + 1].position, segmentInterpolation);
-                    //
-                    // // Add a sine wave to the movement
-                    // _sineAngle += Time.deltaTime * _sineSpeed;
-                    // Vector2 randomMovement = new Vector2(Mathf.Sin(_sineAngle) * _sineLength, Mathf.Cos(_sineAngle) * _sineLength);
-                    // transform.position = basePosition + randomMovement;
+                    transform.position = Vector2.Lerp(_waypoints[i].position, _waypoints[i + 1].position, segmentInterpolation);
                     
                     break;
                 }
                 
-                currentTotalSegmentLength += currentSegmentLength;
+                pastSegmentsLength += currentSegmentLength;
             }
         }
         else

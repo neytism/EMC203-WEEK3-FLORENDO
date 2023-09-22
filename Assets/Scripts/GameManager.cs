@@ -15,17 +15,15 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (_instance == null) {
-            
+        if (_instance == null)
+        {
             _instance = this;
-            
-        } else if (_instance != this) {
-            
-            Destroy (gameObject);
-            
+            DontDestroyOnLoad(gameObject);
         }
- 
-        DontDestroyOnLoad (gameObject);
+        else
+        {
+            Destroy(this);
+        }
     }
 
     #endregion
@@ -107,6 +105,10 @@ public class GameManager : MonoBehaviour
         ObjectPool.Instance.DisposeAll();
         EnemySpawner.Instance.ResetSpawner();
         Time.timeScale = 1f;
+        Scene currentScene = SceneManager.GetActiveScene();
+        _health = 10;
+        _coins = 0;
+        SceneManager.LoadScene(currentScene.name);
     }
 
     IEnumerator GameOverCoroutine()
@@ -114,6 +116,7 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
         yield return new WaitForSecondsRealtime(3f);
         Restart();
+        
 
     }
     

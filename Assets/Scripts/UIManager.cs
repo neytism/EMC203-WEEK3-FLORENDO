@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class UIManager : MonoBehaviour
 {
+    public static event Action StartNextWaveButtonTrigger;
+
     [SerializeField] private TextMeshProUGUI _healthText;
     [SerializeField] private TextMeshProUGUI _coinText;
     [SerializeField] private TextMeshProUGUI _waveNumberText;
@@ -41,6 +43,11 @@ public class UIManager : MonoBehaviour
     private void UpdateUIWaveButton(bool b)
     {
         _startWaveButton.SetActive(b);
+    }
+
+    public void StartNextWaveButtonClicked()
+    {
+        StartNextWaveButtonTrigger?.Invoke();
     }
 
 

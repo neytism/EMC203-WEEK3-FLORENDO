@@ -213,7 +213,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _bulletLife: 3
   enableDebug: 1
-  _bulletRange: 0.5
-  _bulletSpeed: 15
+  _bulletRange: 0.75
+  _bulletSpeed: 30
   _trailRenderer: {fileID: 6931614351570754930}
   _particle: {fileID: 2218350500062538740, guid: 62b54166704b5164ebcad2673e5fddc7, type: 3}

@@ -42,6 +42,7 @@ public class TurretTest : MonoBehaviour
     private void Start()
     {
         UpdateUI();
+        randomTargetChangeInterval = 0f;  
     }
 
     private void Update()
@@ -99,6 +100,7 @@ public class TurretTest : MonoBehaviour
         float angle = Mathf.Atan2(directionToPlayer.y, directionToPlayer.x) * Mathf.Rad2Deg - 90;
         Quaternion zRotation = Quaternion.Euler(0f, 0f, angle);
         transform.rotation = Quaternion.Slerp(transform.rotation, zRotation, _turnSpeed * Time.deltaTime);
+        randomAngle = transform.up;
     }
 
     private void RotateTowardsRandom()
@@ -117,7 +119,7 @@ public class TurretTest : MonoBehaviour
         
         float angle = Mathf.Atan2(randomAngle.y, randomAngle.x) * Mathf.Rad2Deg - 90;
         Quaternion zRotation = Quaternion.Euler(0f, 0f, angle);
-        transform.rotation = Quaternion.Slerp(transform.rotation, zRotation, (_turnSpeed / 5) * Time.deltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, zRotation, (_turnSpeed / 10) * Time.deltaTime);
     }
     
     private void Fire()

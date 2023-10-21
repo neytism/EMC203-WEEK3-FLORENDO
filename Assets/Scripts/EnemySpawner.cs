@@ -18,7 +18,6 @@ public class EnemySpawner : MonoBehaviour
         if (_instance == null)
         {
             _instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -28,8 +27,8 @@ public class EnemySpawner : MonoBehaviour
 
     #endregion
 
-    public event Action<int> UpdateUIWaveCount;
-    public event Action<bool> UpdateUIWaveButton;
+    public static event Action<int> UpdateUIWaveCount;
+    public static event Action<bool> UpdateUIWaveButton;
     
     [SerializeField] private float _enemySpawnRate = 2f;
     [SerializeField] private GameObject _enemyPrefab;

@@ -18,15 +18,15 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         GameManager.Instance.UpdateUITrigger += UpdateUICoinHealth;
-        EnemySpawner.Instance.UpdateUIWaveCount += UpdateUIWaveCount;
-        EnemySpawner.Instance.UpdateUIWaveButton += UpdateUIWaveButton;
+        EnemySpawner.UpdateUIWaveCount += UpdateUIWaveCount;
+        EnemySpawner.UpdateUIWaveButton += UpdateUIWaveButton;
     }
 
     private void OnDisable()
     {
         GameManager.Instance.UpdateUITrigger -= UpdateUICoinHealth;
-        EnemySpawner.Instance.UpdateUIWaveCount -= UpdateUIWaveCount;
-        EnemySpawner.Instance.UpdateUIWaveButton -= UpdateUIWaveButton;
+        EnemySpawner.UpdateUIWaveCount -= UpdateUIWaveCount;
+        EnemySpawner.UpdateUIWaveButton -= UpdateUIWaveButton;
     }
     
     private void UpdateUICoinHealth(int health, int coins)
